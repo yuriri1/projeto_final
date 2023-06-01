@@ -13,7 +13,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   switch: {
-    transform: [{ scaleX: 2 }, { scaleY: 2 }],
+    transform: [{ scaleX: 2 }, { scaleY: 2 }, {rotate: "90deg"}],
+    marginBottom: 20,
   },
 });
 
