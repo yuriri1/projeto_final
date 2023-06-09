@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Text, View, Switch, Vibration } from "react-native";
+import { Text, View, TouchableOpacity, Vibration } from "react-native";
 import axios from "axios";
 import styles from "../styles/styles";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -12,7 +12,7 @@ export default function Main() {
   const toggleSwitch = () => {
     if (!isToggleEnabled) return;
 
-    setIsToggleEnabled(false)
+    setIsToggleEnabled(false);
 
     setIsEnabled((previousState) => !previousState);
     Vibration.vibrate(100);
@@ -24,12 +24,11 @@ export default function Main() {
         { headers: { "Content-Type": "application/json" } }
       );
       console.log("Ligando");
-      
+
       setTimeout(() => {
-        setIsToggleEnabled(true)
+        setIsToggleEnabled(true);
         console.log("Liberando");
       }, 5000);
-
     } else {
       axios.put(
         "http://192.168.0.25:8090/estado",
@@ -38,7 +37,7 @@ export default function Main() {
       );
       console.log("Desligando");
       setTimeout(() => {
-        setIsToggleEnabled(true)
+        setIsToggleEnabled(true);
         console.log("Liberando");
       }, 5000);
     }
@@ -66,19 +65,13 @@ export default function Main() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Temperatura Atual: {temperature}</Text>
-      <Text style={styles.text}>Liga / Desliga</Text>
-      <Switch
-        style={styles.switch}
-        trackColor={{ true: "#767577", false: "#81b0ff" }}
-        thumbColor={isEnabled ? "#1f1f1f" : "#11b0ff"}
-        onValueChange={toggleSwitch}
-        value={isEnabled}
-      />
-      <Icon
-        name={isEnabled ? "check-circle" : "times-circle"}
-        size={30}
-        color={isEnabled ? "green" : "red"}
-      />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={toggleSwitch}
+        disabled={!isToggleEnabled}
+      >
+        <Icon name="power-off" size={80} color={isEnabled ? "#191919" : "#f9c784"} />
+      </TouchableOpacity>
     </View>
   );
 }
