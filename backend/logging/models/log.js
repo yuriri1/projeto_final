@@ -3,11 +3,11 @@ const Schema = mongoose.Schema
 
 const logSchema = new Schema({
     temperature: {
-        type: Number,
+        type: String,
         required: true
     },
     date_time: {
-        type: Date,
+        type: String,
         required: true
     }
 })

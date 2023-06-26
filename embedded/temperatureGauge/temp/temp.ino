@@ -18,20 +18,22 @@ Thermistor temp(A0);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
 
-const char *ssid = "YuriFi";
-const char *password = "19283746";
-const char *url = "ipDaMaquina/8080/log"
+const char *ssid = "CASADOJOARES_2.4";
+const char *password = "32380958";
 
-	int tempAtual = 0;
+const char *hostEstado = "http://192.168.0.25:8090/estado";
+const char *hostTemperatura = "http://192.168.0.25:8080/log";
+
+int tempAtual = 0;
 int tempAntg = 0;
 
 void setup()
 {
 	Serial.begin(9600);
 
-	motor.setMaxSpeed(500.0);
-	motor.setAcceleration(100.0);
-	motor.setSpeed(50);
+	motor.setMaxSpeed(200.0);
+	motor.setAcceleration(50.0);
+	motor.setSpeed(30);
 	motor.setCurrentPosition(0);
 
 	conexao();
@@ -50,20 +52,19 @@ void loop()
 		Serial.println("Ligado");
 		timeClient.update();
 		String hour = timeClient.getFormattedTime();
-		Serial.println(hour);
 
-		// tempAtual = temp.getTemp();
+		tempAtual = temp.getTemp();
 		postTemperature(tempAtual, hour);
-		// if (tempAtual != tempAntg) {
-		// 	moverPonteiro();
-		// }
+		if (tempAtual != tempAntg) {
+			moverPonteiro();
+		}
 	}
 	else
 	{
 		Serial.println("Desligado");
 	}
 
-	delay(5000);
+	delay(2000);
 }
 
 void moverPonteiro()
@@ -108,25 +109,58 @@ void conexao()
 
 int getStatus()
 {
-	// Req get do status
-	return 1;
+	if (WiFi.status() == WL_CONNECTED){
+		WiFiClient client;
+		HTTPClient http;
+		http.begin(client, hostEstado);
+		int httpCode = http.GET();
+		if (httpCode == HTTP_CODE_OK)
+		{
+			String payload = http.getString();
+			Serial.println(httpCode);
+			Serial.println(payload);
+			if (payload == "on")
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			Serial.println("GET ERROR");
+			Serial.println(httpCode);
+		}
+		http.end();
+	}
+	return 0;
 }
 
 void postTemperature(int temperature, String date_time)
 {
 	char content[50];
 	sprintf(content, "temperature=%d&date_time=%s", temperature, date_time);
-	Serial.println(content);
 	if (WiFi.status() == WL_CONNECTED)
 	{
 		WiFiClient client;
 		HTTPClient http;
-		http.begin(client, url);
+		http.begin(client, hostTemperatura);
 		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 		int httpCode = http.POST(content);
-		String payload = http.getString();
-		Serial.println(httpCode);
-		Serial.println(payload);
+		if (httpCode == HTTP_CODE_OK)
+		{
+			Serial.println("POST OK");
+			String payload = http.getString();
+			Serial.println(httpCode);
+			Serial.println(payload);
+		}
+		else
+		{
+			Serial.println("POST ERROR");
+			Serial.println(httpCode);
+		}
 		http.end();
 	}
 	else

@@ -41,7 +41,7 @@ app.post("/log", async (req, res) => {
 })
 
 //Metodos para o app
-app.get("/temperaturas", async (req, res) => {
+app.get("/log", async (req, res) => {
   try {
     const result = await Log.findOne().sort({ _id: -1 }).exec()
     res.status(200).send(result)

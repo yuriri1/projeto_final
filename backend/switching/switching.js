@@ -28,8 +28,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/estado", async (req, res) => {
   try {
     const result = await State.find().exec();
-    console.log(result);
-    res.status(200).send(result);
+    console.log(result[0].state);
+    res.status(200).send(result[0].state);
   } catch (error) {
     console.log(error);
   }
